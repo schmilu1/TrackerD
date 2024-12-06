@@ -49,7 +49,7 @@ ATEerror_t at_sleep_run(const char *param)
   if(sys.sensor_type == 13)
   {  
   sys.FDR_flag = 0; 
-  hal_sleep();    
+  esp_deep_sleep_start();    
   sys.LORA_EnterSleepMode();
   esp_deep_sleep_start(); //DeepSleep  
   }

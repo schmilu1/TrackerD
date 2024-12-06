@@ -713,7 +713,7 @@ void do_send(osjob_t* j)
       // as it could result in invalid date being sent to TTN Mapper
       if (sys.mod == 2)
       {
-	sys.loggpsdata = 0;
+	sys.loggpsdata_send = 0;
       }
       if(sys.loggpsdata_send == 1)
       {
@@ -1350,8 +1350,8 @@ void setup() {
       {
 //定时器
         timerSemaphore = xSemaphoreCreateBinary();
-        timer = timerBegin(0, 80, true);
-        timerAttachInterrupt(timer, &onTimer, true);
+        timer = timerBegin(0); // Only pass the frequency
+        timerAttachInterrupt(timer, &onTimer); // Remove the third argument
         timerAlarmWrite(timer, sys.Positioning_time*1000, true);
         timerAlarmEnable(timer);
       }         

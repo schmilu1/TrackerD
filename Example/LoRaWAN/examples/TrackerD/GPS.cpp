@@ -1,5 +1,5 @@
 #include "GPS.h"
-#include <TinyGPS++.h>
+#include <TinyGPSpp.h>
 
 HardwareSerial SerialGPS(1);
 TinyGPSPlus gps;

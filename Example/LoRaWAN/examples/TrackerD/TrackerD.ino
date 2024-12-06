@@ -713,7 +713,7 @@ void do_send(osjob_t* j)
       // as it could result in invalid date being sent to TTN Mapper
       if (sys.mod == 2)
       {
-	sys.loggpsdata_send = 0;
+	      sys.loggpsdata_send = 0;
       }
       if(sys.loggpsdata_send == 1)
       {

@@ -100,6 +100,6 @@ void LORA::LORA_EnterSleepMode( void)
 {
 	uint8_t cmd = 0;
 	uint8_t reg_mode = 0x01;
-	hal_spi_write(reg_mode,&cmd,1);
+	lmic_hal_spi_write(reg_mode,&cmd,1);
 }
 

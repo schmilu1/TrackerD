@@ -17,11 +17,11 @@ Distributed as-is; no warranty is given.
 
 #include "stdint.h"
 
-#if defined(ARDUINO) && ARDUINO >= 100
-    #include "Arduino.h"
-#else
-    #include "WProgram.h"
-#endif
+//#if defined(ARDUINO) && ARDUINO >= 100
+#include "Arduino.h"
+//#else
+//#include "WProgram.h"
+//#endif
 
 #if defined LOW_POWER && defined NORMAL_MODE
 	#error Please choose between the 3 resolution types

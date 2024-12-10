@@ -12,6 +12,7 @@
 #include <BLEAdvertisedDevice.h>
 #include <BLEBeacon.h>
 #include <BLEClient.h>
+//#include <cstring>
 
 #define ENDIAN_CHANGE_U16(x) ((((x)&0xFF00) >> 8) + (((x)&0xFF) << 8))
 
@@ -42,11 +43,15 @@ class MyAdvertisedDeviceCallbacks : public BLEAdvertisedDeviceCallbacks
     {
         if (advertisedDevice.haveManufacturerData() == true)
         {
-          std::string strManufacturerData = advertisedDevice.getManufacturerData();
+/*          String strManufacturerData = advertisedDevice.getManufacturerData().c_str();
           int dataLength = advertisedDevice.getManufacturerData().length();
-          char *pHex = BLEUtils::buildHexData(nullptr, (uint8_t*)advertisedDevice.getManufacturerData().data(), dataLength);    
+          char *pHex = BLEUtils::buildHexData(nullptr, (uint8_t*)advertisedDevice.getManufacturerData().c_str(), dataLength);    
           char cManufacturerData[100];
-          strManufacturerData.copy((char *)cManufacturerData, strManufacturerData.length(), 0);      
+            // Kopiere den Inhalt von strManufacturerData in cManufacturerData
+          strncpy(cManufacturerData, strManufacturerData.c_str(), sizeof(cManufacturerData) - 1);
+          // Stelle sicher, dass der Zielpuffer nullterminiert ist
+          cManufacturerData[sizeof(cManufacturerData) - 1] = '\0';
+          //strManufacturerData.copy((char *)cManufacturerData, strManufacturerData.length());      
           if (strManufacturerData.length() == 25 && cManufacturerData[0] == 0x4C && cManufacturerData[1] == 0x00 && strlen(pHex) == 50)
           {
               if(sys.lon == 1)
@@ -54,31 +59,31 @@ class MyAdvertisedDeviceCallbacks : public BLEAdvertisedDeviceCallbacks
                 digitalWrite(2, HIGH);
               }
               BLEBeacon oBeacon = BLEBeacon();
-              oBeacon.setData(strManufacturerData);
+              oBeacon.setData(strManufacturerData.c_str());
               Serial.println("Found an iBeacon!");
               id.setData(advertisedDevice.getManufacturerData());
               //Print UUID
-  //            Serial.print("UUID :");
+              //Serial.print("UUID :");
               String bUUID = id.getProximityUUID().toString().c_str();
               bUUID = reverse(bUUID);
-  //            Serial.print(bUUID);
+              // Serial.print(bUUID);
         
               //Print RSSI
-  //            Serial.print(",RSSI :");
+              // Serial.print(",RSSI :");
               int bRSSI = advertisedDevice.getRSSI();
               Serial.print(bRSSI);
               ltoa(bRSSI,brssi,10);
-  //            Serial.printf(brssi);
+              //Serial.printf(brssi);
               
               //Print Major
-  //            Serial.print(",Major :");
+              //Serial.print(",Major :");
               int bMajor = id.getMajor() / 256;
-  //            Serial.print(bMajor);
+              //Serial.print(bMajor);
         
               //Print Minor
-  //            Serial.print(",Minor :");
+              //Serial.print(",Minor :");
               int bMinor = id.getMinor() / 256;
-  //            Serial.print(bMinor);
+              //Serial.print(bMinor);
               Serial.println("");
               memset(mydata1,0,sizeof(mydata1));
               memcpy(bufftest1,pHex+40,strlen(pHex)-42);
@@ -123,13 +128,13 @@ class MyAdvertisedDeviceCallbacks : public BLEAdvertisedDeviceCallbacks
                   for(int i=0;i<5;i++)
                   {
                     bledata1[i+sys.blecount] = mydata1[i];
-//                    sys.blecount++;
+                    //sys.blecount++;
                   }
-//                  for(int i=0;i<sc_count*5;i++)
-//                      Serial.printf("%.2x ",bledata1[i]);
-//                  Serial.println();                  
+                  //for(int i=0;i<sc_count*5;i++)
+                  //Serial.printf("%.2x ",bledata1[i]);
+                  //Serial.println();                  
                   sys.blecount = sc_count*5;
-//                  Serial.printf("sys.blecount:%d\r\n", sys.blecount);                            
+                  //Serial.printf("sys.blecount:%d\r\n", sys.blecount);                            
                 } 
               }            
             }
@@ -149,14 +154,14 @@ class MyAdvertisedDeviceCallbacks : public BLEAdvertisedDeviceCallbacks
                   for(int i=0;i<5;i++)
                   {
                     bledata1[i+sys.blecount] = mydata1[i];
-//                    sys.blecount++;
+                  //sys.blecount++;
                   }
                   sys.blecount = sc_count*5;
-//                  Serial.printf("sys.blecount:%d\r\n", sys.blecount);                            
+                  //Serial.printf("sys.blecount:%d\r\n", sys.blecount);                            
                 } 
               }               
             }
-          }
+          }*/
         }
         return;
     }
@@ -179,9 +184,9 @@ void ble_init()
 void ble_run()
 {
   // put your main code here, to run repeatedly:
-  BLEScanResults foundDevices = pBLEScan->start(scanTime, false);
+  BLEScanResults *foundDevices = pBLEScan->start(scanTime, false);
   Serial.print("Devices found: ");
-  Serial.println(foundDevices.getCount());
+  Serial.println(foundDevices->getCount());
   Serial.println("Scan done!");  
   ble_data();
   pBLEScan->clearResults(); // delete results fromBLEScan buffer to release memory 

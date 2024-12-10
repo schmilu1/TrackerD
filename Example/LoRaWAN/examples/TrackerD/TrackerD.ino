@@ -1,8 +1,7 @@
 #include <SPI.h>
 #include "common.h"
 #include "lis3dh-motion-detection.h"
-#include "driver/rtc_io.h" 
-#include "hal/rtc_io_hal.h"
+
 #define HIGH_RESOLUTION
 #define maxRxSize       128 
 #define EXTI_PIN        0
@@ -901,9 +900,9 @@ void do_send(osjob_t* j)
             {
               mydata[i++]=sys.bledata[j];
             }     
-//            for(int a=0;a<sys.blecount;a++)
-//               Serial.printf("%.2x ",mydata[a]);
-//            Serial.println();             
+            //            for(int a=0;a<sys.blecount;a++)
+            //               Serial.printf("%.2x ",mydata[a]);
+            //            Serial.println();             
                                                
           }          
         }
@@ -928,11 +927,11 @@ void device_send(osjob_t* j)
       Device_status();
       sys.port = 0x05;
       mydata[i++] = devicet.sensor_type;
-//      if(sys.pedometer == 1)
-//      { 
-//        mydata[i++] = (devicet.firm_ver>>24)&0xff;
-//        mydata[i++] = (devicet.firm_ver>>16)&0xff;
-//      }
+      //      if(sys.pedometer == 1)
+      //      { 
+      //        mydata[i++] = (devicet.firm_ver>>24)&0xff;
+      //        mydata[i++] = (devicet.firm_ver>>16)&0xff;
+      //      }
       mydata[i++] = (devicet.firm_ver>>8)&0xff;
       mydata[i++] = devicet.firm_ver&0xff;
       mydata[i++] = devicet.freq_band;
@@ -982,7 +981,7 @@ void SaveLMICToRTC(int deepsleep_sec)
     // Therefore reset DutyCyles
 
     unsigned long now = millis();
-#if CFG_LMIC_EU_like
+    #if CFG_LMIC_EU_like
     for (int i = 0; i < MAX_BANDS; i++)
     {
         ostime_t correctedAvail = RTC_LMIC.bands[i].avail - ((now / 1000.0 + deepsleep_sec) * OSTICKS_PER_SEC);
@@ -998,23 +997,23 @@ void SaveLMICToRTC(int deepsleep_sec)
         RTC_LMIC.globalDutyAvail = 0;
     }
     
-#else
-//    for (int i = 0; i < 4; i++)
-//    {
-//        ostime_t correctedAvail = RTC_LMIC.channelDrMap[i].avail - ((now / 1000.0 + deepsleep_sec) * OSTICKS_PER_SEC);
-//        if (correctedAvail < 0)
-//        {
-//            correctedAvail = 0;
-//        }
-//        RTC_LMIC.channelDrMap[i].avail = correctedAvail;
-//    }
+      #else
+      //    for (int i = 0; i < 4; i++)
+      //    {
+      //        ostime_t correctedAvail = RTC_LMIC.channelDrMap[i].avail - ((now / 1000.0 + deepsleep_sec) * OSTICKS_PER_SEC);
+      //        if (correctedAvail < 0)
+      //        {
+      //            correctedAvail = 0;
+      //        }
+      //        RTC_LMIC.channelDrMap[i].avail = correctedAvail;
+      //    }
 
     RTC_LMIC.globalDutyAvail = RTC_LMIC.globalDutyAvail - ((now / 1000.0 + deepsleep_sec) * OSTICKS_PER_SEC);
     if (RTC_LMIC.globalDutyAvail < 0)
     {
         RTC_LMIC.globalDutyAvail = 0;
     }
-#endif    
+  #endif    
 }
 
 static void print_wakeup_reason()
@@ -1049,7 +1048,7 @@ static void print_wakeup_reason()
         if(sys.pedometer == 0) 
         {
           button_Count1 =1;
-  //        sys.keep_flag =1;
+          //        sys.keep_flag =1;
           intwk_flag =1;
           sys.gps_start = 2;        
           myIMU.imu_power_down();       
@@ -1078,7 +1077,7 @@ static void print_wakeup_reason()
       }
     break;
     case ESP_SLEEP_WAKEUP_EXT1 : 
-//      gpio_deep_sleep_hold_dis();
+      //      gpio_deep_sleep_hold_dis();
       sys.gps_start = 0;
       sys.exti_flag = 0;
       sys.sleep_exti =0;
@@ -1121,12 +1120,12 @@ static void print_wakeup_reason()
         if(TDC_Time <= 3600000 )
         {
          Pedometer_Count = 0;
-//         Serial.println("TDC_Time <= 3600000"); 
+        //         Serial.println("TDC_Time <= 3600000"); 
         }  
       }
     }
-//    gpio_hold_dis((gpio_num_t)12);
-//    gpio_deep_sleep_hold_dis();
+    //    gpio_hold_dis((gpio_num_t)12);
+    //    gpio_deep_sleep_hold_dis();
     Serial.println("Wakeup caused by timer");
     break;
     case ESP_SLEEP_WAKEUP_TOUCHPAD : Serial.println("Wakeup caused by touchpad"); break;
@@ -1200,7 +1199,7 @@ static void print_wakeup_reason()
         sys.Positioning_time = 180000;
         sys.exit_alarm_time =2000;
         sys.beep_flag =0;
-//        sys.sensor_type =22;
+        //        sys.sensor_type =22;
         sys.TF[0] ={0x14};    
       }
       sys.tdc = sys.sys_time;    
@@ -1221,17 +1220,17 @@ static void print_wakeup_reason()
 }
 
 void setup() {
-// put your setup code here, to run once:
+  // put your setup code here, to run once:
   Wire.begin();
   Serial.begin(115200); 
   sys.eeprom_init();
   sys.config_Read();
   print_wakeup_reason();
-//  button_event_init();
+  //  button_event_init();
  device_strcmp();
-// LMIC init
+  // LMIC init
   os_init();
-// Reset the MAC state. Session and pending data transfers will be discarded.
+  // Reset the MAC state. Session and pending data transfers will be discarded.
   LMIC_reset();
   if(sys.njm==0)
   {
@@ -1348,12 +1347,12 @@ void setup() {
       Serial.println("Start searching for GPS...");
       if(sys.Positioning_time != 0)
       {
-//定时器
+      //定时器
         timerSemaphore = xSemaphoreCreateBinary();
-        timer = timerBegin(0); // Only pass the frequency
-        timerAttachInterrupt(timer, &onTimer); // Remove the third argument
-        timerAlarmWrite(timer, sys.Positioning_time*1000, true);
-        timerAlarmEnable(timer);
+        timer = timerBegin(80); 
+        timerAttachInterrupt(timer, &onTimer);
+        timerAlarm(timer, sys.Positioning_time*1000,true,0);
+        timerStart(timer);
       }         
     }
     else if(sys.sensor_mode == 2|| sys.sensor_mode == 3 || bg_mode == 2 || bg_mode == 3)
@@ -1454,7 +1453,7 @@ void loop() {
                else
                {
                   TDC_Time = sys.sys_time;
-//                  tdc_time();
+                  //                  tdc_time();
                   if(sys.tdc >=4200000)
                   {
                     sys.tdc = 3600000-sys.mtdc-10000;
@@ -1504,7 +1503,7 @@ void gps_send(void)
       sys.gps_work_flag = false;
       if(sys.Positioning_time != 0)
       {
-        timerAlarmDisable(timer);
+        timerEnd(timer);
       }
     }
     else if(sys.loggpsdata_send == 1 || sys.ble_flag ==1)
@@ -1601,7 +1600,7 @@ void sys_sleep(void)
     
     if(sys.keep_flag == 1)
     {
-//      Serial.println("imu_power_down");
+      //      Serial.println("imu_power_down");
       LIS3DH_configIntterupts();
       myIMU.imu_power_down();  
     }
@@ -1654,7 +1653,7 @@ void sys_sleep(void)
        TDC_Count ++;   
       }
     }
-//    os_JOINED_flag = 1;
+    //    os_JOINED_flag = 1;
     Serial.println("Enter sleep mode");
     if(turn_interrupts == 1 && bg_flag == 0)
     {
@@ -1783,7 +1782,7 @@ void alarm_state(void)
             digitalWrite(LED_PIN_RED, LOW);                
           }  
           delay(5000);
-//          Serial.println("stop");
+          //          Serial.println("stop");
           Stop_buzzer();
           sys.keep_flag = 1;
         } 
@@ -1967,7 +1966,7 @@ void alarm_state(void)
        if(sys.pedometer == 1)
        {
          sys.tdc = sys.mtdc-Pedometer_Count*2000;   
-//         Serial.printf("pedometer:%d\r",Pedometer_Count); 
+  //         Serial.printf("pedometer:%d\r",Pedometer_Count); 
        }
       }
       if(EXIT_flag == 1 && button_Count1 == 0 )
@@ -2091,10 +2090,10 @@ void alarm_state(void)
         {
   //定时器
           timerSemaphore = xSemaphoreCreateBinary();
-          timer = timerBegin(0, 80, true);
-          timerAttachInterrupt(timer, &onTimer, true);
-          timerAlarmWrite(timer, sys.Positioning_time*1000, true);
-          timerAlarmEnable(timer);
+          timer = timerBegin(80);
+          timerAttachInterrupt(timer, &onTimer);
+          timerAlarm(timer, sys.Positioning_time*1000,true,0);
+          timerStart(timer);
         }
         sys.exti_flag = 4; 
       }
@@ -2144,10 +2143,10 @@ void downlink_alarm_send(void)
     {
       //定时器
       timerSemaphore = xSemaphoreCreateBinary();
-      timer = timerBegin(0, 80, true);
-      timerAttachInterrupt(timer, &onTimer, true);
-      timerAlarmWrite(timer, sys.Positioning_time*1000, true);
-      timerAlarmEnable(timer);
+      timer = timerBegin(80);
+      timerAttachInterrupt(timer, &onTimer);
+      timerAlarm(timer, sys.Positioning_time*1000,true,0);
+      timerStart(timer);
     }
   }
   else if(sys.sensor_mode == 2 || sys.sensor_mode == 3)
@@ -2248,12 +2247,12 @@ void LIS3DH_configIntterupts(void)
     myIMU.readRegister(&dataRead, LIS3DH_INT1_SRC);//cleared by reading
     
   }
-//  if(sys.showid == 1)
-//  {
-//    Serial.print("LIS3DH_INT1_SRC: 0x");
-//    Serial.println(dataRead, HEX);
-//    Serial.println("Decoded events:");
-//  }
+  //  if(sys.showid == 1)
+  //  {
+  //    Serial.print("LIS3DH_INT1_SRC: 0x");
+  //    Serial.println(dataRead, HEX);
+  //    Serial.println("Decoded events:");
+  //  }
   delay(100); 
 }
 
@@ -2330,7 +2329,7 @@ static void LORA_RxData(uint8_t *AppData, uint8_t AppData_Len)
       if(( AppData_Len == 2 )&&(AppData[1]==0x02)) 
       {
           buzzer(); 
-//          sys.device_flag =1;
+          //sys.device_flag =1;
           sys.gps_work_flag=false; 
           sys.collect_sensor_flag=false; 
           os_run_flag=false;

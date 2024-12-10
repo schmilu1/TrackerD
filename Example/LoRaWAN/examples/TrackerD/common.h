@@ -10,11 +10,10 @@
 #include "wifiscan.h"
 #include "driver/rtc_io.h" 
 #include "hal/rtc_io_hal.h"
-//Neu hinzugefügt:
 #include "driver/ledc.h"
 #include "esp32-hal-timer.h"
 #include "esp_sleep.h"
-// ------------------------//
+
 
 #define Pro_model           "TrackerD "
 #define Pro_version         "v1.4.9"

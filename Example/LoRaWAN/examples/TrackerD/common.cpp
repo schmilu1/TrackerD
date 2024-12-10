@@ -80,27 +80,25 @@ void buzzer(void)
 //  digitalWrite(BAT_PIN_LOW, LOW);
 //  delay(1000);
   digitalWrite(BAT_PIN_LOW, HIGH);
-  ledcSetup(channel, freq, resolution);
-  ledcAttachPin(BAT_PIN_LOW, channel);  
-  ledcWriteTone(channel, 2000);
+  ledcAttach(BAT_PIN_LOW, freq, resolution);  
+  ledcWriteTone(BAT_PIN_LOW, 2000);
   for (int dutyCycle = 255; dutyCycle <= 255; dutyCycle = dutyCycle + 10) {
 //    Serial.println(dutyCycle);
-    ledcWrite(channel, dutyCycle);
+    ledcWrite(BAT_PIN_LOW, dutyCycle);
     delay(500);
   }  
-  ledcWrite(channel, 125);
+  ledcWrite(BAT_PIN_LOW, 125);
 }
 
 void Stop_buzzer(void)
 {
   pinMode(BAT_PIN_LOW,OUTPUT);
   freq = 0;
-  ledcSetup(channel, freq, resolution);
-  ledcAttachPin(BAT_PIN_LOW, channel);  
-  ledcWriteTone(channel, 2000);
+  ledcAttach(BAT_PIN_LOW, freq, resolution);  
+  ledcWriteTone(BAT_PIN_LOW, 2000);
   for (int dutyCycle = 0; dutyCycle <= 0; dutyCycle = dutyCycle ) {
 //    Serial.println(dutyCycle);
-    ledcWrite(channel, dutyCycle);
+    ledcWrite(BAT_PIN_LOW, dutyCycle);
     delay(500);
     break;
   }  

@@ -16,34 +16,30 @@
 
 #define ENDIAN_CHANGE_U16(x) ((((x)&0xFF00) >> 8) + (((x)&0xFF) << 8))
 
-int scanTime = 5; //In seconds
+int scanTime = 5;  //In seconds
 BLEScan *pBLEScan;
-char brssi[10],bmin[10],bmax[10];
-int sc_count =0;
-int sc_flag =0,num = 0;
-int mod =0;
+char brssi[10], bmin[10], bmax[10];
+int sc_count = 0;
+int sc_flag = 0, num = 0;
+int mod = 0;
 char bufftest[100];
 char bufftest1[100];
-uint8_t mydata1[5] = {0};
-uint8_t bledata1[240]= {0};
+uint8_t mydata1[5] = { 0 };
+uint8_t bledata1[240] = { 0 };
 BLEBeacon id;
 
 String reverse(String str) {
   String rev;
   for (int i = str.length() - 1; i >= 0; i--) {
     rev = rev + str[i];
-  } 
+  }
   return rev;
-
 }
 
-class MyAdvertisedDeviceCallbacks : public BLEAdvertisedDeviceCallbacks
-{
-    void onResult(BLEAdvertisedDevice advertisedDevice)
-    {
-        if (advertisedDevice.haveManufacturerData() == true)
-        {
-/*          String strManufacturerData = advertisedDevice.getManufacturerData().c_str();
+class MyAdvertisedDeviceCallbacks : public BLEAdvertisedDeviceCallbacks {
+  void onResult(BLEAdvertisedDevice advertisedDevice) {
+    if (advertisedDevice.haveManufacturerData() == true) {
+      /*          String strManufacturerData = advertisedDevice.getManufacturerData().c_str();
           int dataLength = advertisedDevice.getManufacturerData().length();
           char *pHex = BLEUtils::buildHexData(nullptr, (uint8_t*)advertisedDevice.getManufacturerData().c_str(), dataLength);    
           char cManufacturerData[100];
@@ -162,183 +158,149 @@ class MyAdvertisedDeviceCallbacks : public BLEAdvertisedDeviceCallbacks
               }               
             }
           }*/
-        }
-        return;
     }
+    return;
+  }
 };
-void ble_init()
-{
+void ble_init() {
   Serial.begin(115200);
   Serial.println("Scanning...");
 
   BLEDevice::init("");
-  pBLEScan = BLEDevice::getScan(); //create new scan
+  pBLEScan = BLEDevice::getScan();  //create new scan
   pBLEScan->setAdvertisedDeviceCallbacks(new MyAdvertisedDeviceCallbacks());
-  pBLEScan->setActiveScan(true); //active scan uses more power, but get results faster
+  pBLEScan->setActiveScan(true);  //active scan uses more power, but get results faster
   pBLEScan->setInterval(100);
-  pBLEScan->setWindow(99); // less or equal setInterval value
-  sc_count = 0;   
+  pBLEScan->setWindow(99);  // less or equal setInterval value
+  sc_count = 0;
   pinMode(2, OUTPUT);
 }
 
-void ble_run()
-{
+void ble_run() {
   // put your main code here, to run repeatedly:
   BLEScanResults *foundDevices = pBLEScan->start(scanTime, false);
   Serial.print("Devices found: ");
   Serial.println(foundDevices->getCount());
-  Serial.println("Scan done!");  
+  Serial.println("Scan done!");
   ble_data();
-  pBLEScan->clearResults(); // delete results fromBLEScan buffer to release memory 
+  pBLEScan->clearResults();  // delete results fromBLEScan buffer to release memory
 }
 
 //Bluetooth scan data processing
-void ble_data(void)
-{
+void ble_data(void) {
   sys.exti_flag = 1;
-  Serial.printf("sc_count= %d\r\n",sc_count);
-  Serial.printf("DATA Length= %d\r\n",strlen(sys.BLEDATA));
-  if(sys.exti_flag != 3 && sc_count != 0)
-  {
-//    Serial.printf("DATA Length= %d\r\n",strlen(sys.BLEDATA));
-//    for(int i = 0;i<strlen(sys.BLEDATA);i++)
-//    {
-//      Serial.printf("%c",sys.BLEDATA[i]);
-//    }
-//    Serial.println("");
-    int len = strlen(sys.BLEDATA)/45;
-//    if(len < 3 &&  sys.ble_mod != 3 )
-//    {
-//      sys.ble_mod = 1;
-//    }
-    if(sys.ble_mod == 0) //Find the three optimal beacons
+  Serial.printf("sc_count= %d\r\n", sc_count);
+  Serial.printf("DATA Length= %d\r\n", strlen(sys.BLEDATA));
+  if (sys.exti_flag != 3 && sc_count != 0) {
+    //    Serial.printf("DATA Length= %d\r\n",strlen(sys.BLEDATA));
+    //    for(int i = 0;i<strlen(sys.BLEDATA);i++)
+    //    {
+    //      Serial.printf("%c",sys.BLEDATA[i]);
+    //    }
+    //    Serial.println("");
+    int len = strlen(sys.BLEDATA) / 45;
+    //    if(len < 3 &&  sys.ble_mod != 3 )
+    //    {
+    //      sys.ble_mod = 1;
+    //    }
+    if (sys.ble_mod == 0)  //Find the three optimal beacons
     {
-        int num2 = 0,num3 = 0;
-        for(int a = 0;a<3;a++)     
-        {
-          strncpy(bmin,&sys.BLEDATA[42],3);   
-//          Serial.printf("bmin:%s\r\n", bmin);
-          for(int i =0;i<strlen(sys.BLEDATA)/45-1;i++)
-          {
-            strncpy(bmax,sys.BLEDATA+(45*(i+1)+42),3); 
-//            Serial.printf("bmax:%s\r\n", bmax);
-            if(strcmp(bmin,bmax)>0)
-            {
-              strncpy(bmin,bmax,3);
-              if(a == 0)
-              {
-                num = i+1;
-              }
-              else if(a == 1)
-              {
-                num2 = i+1;
-              }
-              else if(a == 2)
-              {
-                num3 = i+1;                                               
-              }
-            }       
+      int num2 = 0, num3 = 0;
+      for (int a = 0; a < 3; a++) {
+        strncpy(bmin, &sys.BLEDATA[42], 3);
+        //          Serial.printf("bmin:%s\r\n", bmin);
+        for (int i = 0; i < strlen(sys.BLEDATA) / 45 - 1; i++) {
+          strncpy(bmax, sys.BLEDATA + (45 * (i + 1) + 42), 3);
+          //            Serial.printf("bmax:%s\r\n", bmax);
+          if (strcmp(bmin, bmax) > 0) {
+            strncpy(bmin, bmax, 3);
+            if (a == 0) {
+              num = i + 1;
+            } else if (a == 1) {
+              num2 = i + 1;
+            } else if (a == 2) {
+              num3 = i + 1;
+            }
           }
-          if(a == 0)
-          {
-            strncpy(sys.BLEDATA1,sys.BLEDATA+(num*45),45);
-            sys.BLEDATA[(num*45)+42] = '9';
-          }
-          else if(a == 1)
-          {
-            strncpy(sys.BLEDATA2,sys.BLEDATA+(num2*45),45);
-            sys.BLEDATA[(num2*45)+42] = '9';
-          }
-          else if(a == 2)
-          {
-            strncpy(sys.BLEDATA3,sys.BLEDATA+(num3*45),45);
-            sys.BLEDATA[(num3*45)+42] = '9';
-          }       
-          sys.ble_flag = 1;                          
         }
-        if(len == 2)
-        {
-         memset(sys.BLEDATA3,0,sizeof(sys.BLEDATA3));  
+        if (a == 0) {
+          strncpy(sys.BLEDATA1, sys.BLEDATA + (num * 45), 45);
+          sys.BLEDATA[(num * 45) + 42] = '9';
+        } else if (a == 1) {
+          strncpy(sys.BLEDATA2, sys.BLEDATA + (num2 * 45), 45);
+          sys.BLEDATA[(num2 * 45) + 42] = '9';
+        } else if (a == 2) {
+          strncpy(sys.BLEDATA3, sys.BLEDATA + (num3 * 45), 45);
+          sys.BLEDATA[(num3 * 45) + 42] = '9';
         }
-        if(sys.showid == 1)
-        {
-          Serial.printf("DATA1:%s\r\n", sys.BLEDATA1);
-          Serial.printf("DATA2:%s\r\n", sys.BLEDATA2);
-          Serial.printf("DATA3:%s\r\n", sys.BLEDATA3);      
-        }    
-    }
-    else if(sys.ble_mod == 1) //Find the optimal beacon
+        sys.ble_flag = 1;
+      }
+      if (len == 2) {
+        memset(sys.BLEDATA3, 0, sizeof(sys.BLEDATA3));
+      }
+      if (sys.showid == 1) {
+        Serial.printf("DATA1:%s\r\n", sys.BLEDATA1);
+        Serial.printf("DATA2:%s\r\n", sys.BLEDATA2);
+        Serial.printf("DATA3:%s\r\n", sys.BLEDATA3);
+      }
+    } else if (sys.ble_mod == 1)  //Find the optimal beacon
     {
-      strncpy(bmin,&sys.BLEDATA[42],3);
-      num = 0;   
+      strncpy(bmin, &sys.BLEDATA[42], 3);
+      num = 0;
       Serial.printf("bmin:%s\r\n", bmin);
-      for(int i =0;i<strlen(sys.BLEDATA)/45-1;i++)
-      {
-        strncpy(bmax,sys.BLEDATA+(45*(i+1)+42),3); 
+      for (int i = 0; i < strlen(sys.BLEDATA) / 45 - 1; i++) {
+        strncpy(bmax, sys.BLEDATA + (45 * (i + 1) + 42), 3);
         Serial.printf("bmax:%s\r\n", bmax);
-        if(strcmp(bmin,bmax)>0)
-        {
-          strncpy(bmin,bmax,3);
-          num = i+1;
+        if (strcmp(bmin, bmax) > 0) {
+          strncpy(bmin, bmax, 3);
+          num = i + 1;
         }
       }
       sys.ble_flag = 1;
-      memset(sys.BLEDATA1,0,sizeof(sys.BLEDATA1));
-      strncpy(sys.BLEDATA1,sys.BLEDATA+(num*45),45);
-      if(sys.showid == 1)
-      {
-        Serial.printf("BLEDATA1:%s\r\n", sys.BLEDATA1);   
+      memset(sys.BLEDATA1, 0, sizeof(sys.BLEDATA1));
+      strncpy(sys.BLEDATA1, sys.BLEDATA + (num * 45), 45);
+      if (sys.showid == 1) {
+        Serial.printf("BLEDATA1:%s\r\n", sys.BLEDATA1);
       }
-    }
-    else if(sys.ble_mod == 3) //Scan all beacons
+    } else if (sys.ble_mod == 3)  //Scan all beacons
     {
 
       sys.ble_flag = 1;
-      int i=0,j=0;
-      for(int i=0;i<sys.blecount;i++)
-      {
-        sys.bledata[j++]=bledata1[i];
+      int i = 0, j = 0;
+      for (int i = 0; i < sys.blecount; i++) {
+        sys.bledata[j++] = bledata1[i];
       }
-      if(sys.showid == 1)
-      {
-        for(int i=0;i<sys.blecount;i++)
-              Serial.printf("%.2x ",sys.bledata[i]);
-          Serial.println();   
+      if (sys.showid == 1) {
+        for (int i = 0; i < sys.blecount; i++)
+          Serial.printf("%.2x ", sys.bledata[i]);
+        Serial.println();
       }
-    }     
-  }
-  else if(sys.sensor_mode == 2 && sc_count == 0 )
-  {
-    for(int i=0;i<45;i++)
-    {
-      sys.BLEDATA1[i]= {'f'};
     }
-    sys.ble_flag = 1;   
-  }
-  else if((strstr(bufftest,sys.blemask_data) == NULL && sc_count == 0)||(sys.sensor_mode == 3 && sc_count == 0))
-  {
-    if(sys.sensor_mode == 3)
-    {
+  } else if (sys.sensor_mode == 2 && sc_count == 0) {
+    for (int i = 0; i < 45; i++) {
+      sys.BLEDATA1[i] = { 'f' };
+    }
+    sys.ble_flag = 1;
+  } else if ((strstr(bufftest, sys.blemask_data) == NULL && sc_count == 0) || (sys.sensor_mode == 3 && sc_count == 0)) {
+    if (sys.sensor_mode == 3) {
       sys.ble_flag = 2;
     }
   }
   digitalWrite(2, LOW);
 }
 
-int hexToint_ble(char *str)
-{
+int hexToint_ble(char *str) {
   int i;
   int n = 0;
-  if(str[0] == '0' && (str[1]=='x' || str[1]=='X'))
+  if (str[0] == '0' && (str[1] == 'x' || str[1] == 'X'))
     i = 2;
   else
     i = 0;
-  for(;(str[i]>='0' && str[i]<='9') || (str[i] >='a' && str[i]<='z') || (str[i]>='A' && str[i]<='Z');i++)
-  {
-    if(tolower(str[i]) > '9')
-     n= 16*n+(10+tolower(str[i]) - 'a');
+  for (; (str[i] >= '0' && str[i] <= '9') || (str[i] >= 'a' && str[i] <= 'z') || (str[i] >= 'A' && str[i] <= 'Z'); i++) {
+    if (tolower(str[i]) > '9')
+      n = 16 * n + (10 + tolower(str[i]) - 'a');
     else
-     n= 16*n + (tolower(str[i]) -'0');
+      n = 16 * n + (tolower(str[i]) - '0');
   }
   return n;
 }

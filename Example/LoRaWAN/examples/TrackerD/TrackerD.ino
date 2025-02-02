@@ -285,7 +285,7 @@ void onEvent (ev_t ev)
                   sys.loggpsdata_send = 0;
                   if(sys.Intwk == 1 && fcnt_flag == 0 && (LMIC.seqnoUp-1 > 1))
                   {
-  //                  button_Count1 = 1;
+                  //                  button_Count1 = 1;
                     LIS3DH_configIntterupts();     
                   }
                   if(ack_datalog == 1) 
@@ -1227,7 +1227,7 @@ void setup() {
   sys.config_Read();
   print_wakeup_reason();
   //  button_event_init();
- device_strcmp();
+  device_strcmp();
   // LMIC init
   os_init();
   // Reset the MAC state. Session and pending data transfers will be discarded.
@@ -1316,13 +1316,13 @@ void setup() {
   {
     LIS3DH_configIntterupts(); 
   }
-  if(sys.pedometer == 1 && Pedometer_OFF ==0)
-  {
-     if(sys.gps_alarm == 0)
-     {
-       LIS3DH_configIntterupts();
-     }     
-  }  
+  // if(sys.pedometer == 1 && Pedometer_OFF ==0)
+  // {
+  //    if(sys.gps_alarm == 0)
+  //    {
+  //      LIS3DH_configIntterupts();
+  //    }     
+  // }  
   if(sys.ble_gps == 0)
   {
     bg_mode = sys.save_sensor_mode;  
@@ -1355,34 +1355,34 @@ void setup() {
         timerStart(timer);
       }         
     }
-    else if(sys.sensor_mode == 2|| sys.sensor_mode == 3 || bg_mode == 2 || bg_mode == 3)
-    {
-      if(sys.sensor_mode == 2 || bg_mode == 2)
-      {      
-        if(sys.ble_mod == 1) 
-        {  
-          Serial.println("Start searching for BLE..."); 
-        }
-        else if(sys.ble_mod == 2) 
-        {  
-          Serial.println("Start searching for WIFI..."); 
-        }        
-      }
-      else if(sys.sensor_mode == 3 || bg_mode == 3)
-      {
-       Serial.println("Enable ble and gps hybrid mode"); 
-      }
-      if(sys.ble_mod == 0||sys.ble_mod == 1||sys.ble_mod == 3) 
-      {       
-        ble_init();
-        ble_run();
-      }
-      else if(sys.ble_mod == 2) 
-      {
-        wifi_scan();
-      }
-      sys.mod = sys.save_mode; 
-    }       
+    // else if(sys.sensor_mode == 2|| sys.sensor_mode == 3 || bg_mode == 2 || bg_mode == 3)
+    // {
+    //   if(sys.sensor_mode == 2 || bg_mode == 2)
+    //   {      
+    //     if(sys.ble_mod == 1) 
+    //     {  
+    //       Serial.println("Start searching for BLE..."); 
+    //     }
+    //     else if(sys.ble_mod == 2) 
+    //     {  
+    //       Serial.println("Start searching for WIFI..."); 
+    //     }        
+    //   }
+    //   else if(sys.sensor_mode == 3 || bg_mode == 3)
+    //   {
+    //    Serial.println("Enable ble and gps hybrid mode"); 
+    //   }
+    //   if(sys.ble_mod == 0||sys.ble_mod == 1||sys.ble_mod == 3) 
+    //   {       
+    //     ble_init();
+    //     ble_run();
+    //   }
+    //   else if(sys.ble_mod == 2) 
+    //   {
+    //     wifi_scan();
+    //   }
+    //   sys.mod = sys.save_mode; 
+    // }       
     sys.alarm_count =0;
     os_JOINED_flag = 0;     
   } 
@@ -1758,12 +1758,12 @@ void sys_sleep(void)
 }
 void alarm_state(void)
 {
-  if(sys.ble_flag == 2)
-  {
-    sys.exti_flag = 3;
-    sys.sensor_mode = 1;    
-    sys.ble_flag = 0; 
-  }
+  // if(sys.ble_flag == 2)
+  // {
+  //   sys.exti_flag = 3;
+  //   sys.sensor_mode = 1;    
+  //   sys.ble_flag = 0; 
+  // }
   if(sys.exti_flag == 1)
   {
     if(sys.gps_alarm == 1)
@@ -2088,7 +2088,7 @@ void alarm_state(void)
         Serial.println("Start searching for GPS...");
         if(sys.Positioning_time != 0)
         {
-  //定时器
+          //定时器
           timerSemaphore = xSemaphoreCreateBinary();
           timer = timerBegin(80);
           timerAttachInterrupt(timer, &onTimer);
@@ -2110,19 +2110,19 @@ void alarm_state(void)
             Serial.println("Start searching for WIFI..."); 
           }        
         }
-        else if(sys.sensor_mode == 3)
-        {
-         Serial.println("Enable ble and gps hybrid mode"); 
-        }
-        if(sys.ble_mod == 1) 
-        {       
-          ble_init();
-          ble_run();
-        }
-        else if(sys.ble_mod == 2) 
-        {
-          wifi_scan();
-        }                   
+        // else if(sys.sensor_mode == 3)
+        // {
+        //  Serial.println("Enable ble and gps hybrid mode"); 
+        // }
+        // if(sys.ble_mod == 1) 
+        // {       
+        //   ble_init();
+        //   ble_run();
+        // }
+        // else if(sys.ble_mod == 2) 
+        // {
+        //   wifi_scan();
+        // }                   
         if(button_Count1  == 1)
         {
           myIMU.imu_power_down();  
@@ -2166,15 +2166,15 @@ void downlink_alarm_send(void)
     {
       Serial.println("Enable ble and gps hybrid mode"); 
     }
-    if(sys.ble_mod == 1) 
-    {       
-      ble_init();
-      ble_run();
-    }
-    else if(sys.ble_mod == 2) 
-    {
-      wifi_scan();
-    } 
+    // if(sys.ble_mod == 1) 
+    // {       
+    //   ble_init();
+    //   ble_run();
+    // }
+    // else if(sys.ble_mod == 2) 
+    // {
+    //   wifi_scan();
+    // } 
   }
   if(sys.gps_work_flag==false && sys.collect_sensor_flag == false )
   {
